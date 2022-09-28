@@ -1,0 +1,30 @@
+#!/bin/bash
+export confpath="/etc/wireguard/wg0.conf"
+export userpath="/etc/wireguard/users"
+export server_pubkey=$(cat /etc/wireguard/server/public.key)
+export endpoint=$(curl -s ifconfig.io)
+#Read variables
+read -p "Enter username: " username
+read -p "Enter ip address: " ip
+read -p "Enter dns server (optional, default is 8.8.8.8): " dns
+
+#Generate user keys
+mkdir $userpath/$username
+wg genkey | tee $userpath/$username/${username}_privatekey | wg pubkey | tee $userpath/$username/${username}_publickey > /dev/null
+pubkey=$(cat $userpath/$username/${username}_publickey)
+privkey=$(cat $userpath/$username/${username}_privatekey)
+
+#Creating server and user config
+#echo -e "User pubkey is: $pubkey \nUser privkey is: $privkey"
+echo -e "#$username\n[Peer]\nPublicKey = $pubkey\nAllowedIPs = $ip\n" >> $confpath
+#echo -e "\nNew lines in wg0.conf:"
+#tail -4 /etc/wireguard/wg0.conf
+
+echo -e "[Interface]\nPrivateKey = $privkey\nAddress = $ip\nDNS = ${dns:-8.8.8.8}\n[Peer]\nPublicKey = $server_pubkey\nAllowedIPs = 0.0.0.0/0\nEndpoint = $endpoint:443\nPersistentKeepalive = 20\n"  >> $userpath/${username}/${username}.conf
+qrencode -t png -o $userpath/$username/$username.png -r $userpath/$username/$username.conf
+#Допилить qrencode -t ansiutf8 /opt/wg-configs/${username}/${username}.conf
+#echo -e "\nClient config is:"
+#cat /opt/wg-configs/${username}/${username}.conf
+
+echo This config file will be in: $userpath/$username/$username.conf
+systemctl restart wg-quick@wg0

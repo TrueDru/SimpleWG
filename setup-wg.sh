@@ -10,7 +10,7 @@ fi
 echo -ne Updating apt...
 apt-get update > /dev/null
 echo -ne "\rUpdating apt...done!\nInstalling wireguard..."
-apt-get install wireguard qrencode> /dev/null
+apt-get install wireguard qrencode -y > /dev/null
 echo -ne "\rInstalling wireguard...done!\nGenerating server private key..."
 mkdir /etc/wireguard/server/
 wg genkey > /etc/wireguard/server/private.key

@@ -21,6 +21,7 @@ echo -ne "\rGenerating server public key...done!\nCreating wg0.conf file...\n"
 read -p "Please, enter wireguard local ip like ip/subnet_prefix (10.10.10.1/24): " ip
 read -p "Please, specify wireguard port (443): " port
 echo "
+[Interface]
 Address = ${ip:-10.10.10.1/24}
 PostUp = iptables -t nat -I POSTROUTING -o eth0 -j MASQUERADE
 PreDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE

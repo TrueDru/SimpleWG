@@ -3,7 +3,7 @@
 # Server installation
 ```
 git clone https://github.com/TrueDru/SimpleWG
-cd SimpleWG-cli
+cd SimpleWG
 chmod +x setup-wg.sh
 sudo ./setup-wg.sh
 ```

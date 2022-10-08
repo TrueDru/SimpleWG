@@ -29,6 +29,7 @@ ListenPort = ${port:-443}
 Privatekey = $(cat /etc/wireguard/server/private.key)" > /etc/wireguard/wg0.conf
 echo -ne "...done!\nEnabling port forwarding..."
 sed -i '/net.ipv4.ip_forward=1/s/^#//g' /etc/sysctl.conf
+sysctl --system
 echo -ne "\rEnabling port forwarding...done!\nEnabling wireguard daemon..."
 systemctl enable wg-quick@wg0.service --now
 echo -ne "\rEnabling wireguard daemon...done!\nSending addwguser to /usr/bin..."

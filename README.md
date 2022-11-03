@@ -11,4 +11,4 @@ sudo ./setup-wg.sh
 ```
 sudo addwguser
 ```
-Now you can find config file and QR code of new client in `/etc/wireguard/users/$username/`
+Now you can find config file and qr code of new client in `/etc/wireguard/users/$username/`

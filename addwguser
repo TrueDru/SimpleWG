@@ -3,10 +3,36 @@ export confpath="/etc/wireguard/wg0.conf"
 export userpath="/etc/wireguard/users"
 export server_pubkey=$(cat /etc/wireguard/server/public.key)
 export endpoint=$(curl -s ifconfig.io)
-#Read variables
-read -p "Enter username: " username
-read -p "Enter ip address: " ip
-read -p "Enter dns server (optional, default is 8.8.8.8): " dns
+#Get variables
+while getopts u:i:d:h
+do
+    case "${flag}" in
+        u) username=${OPTARG};;
+        i) ip=${OPTARG};;
+        d) dns=${OPTARG};;
+        h) cat << EOF
+Usage: addwguser -u username -i ip -d dns (optional)
+-u Username (config name)
+-i Ip address
+-d Dns server (optional, default is 8.8.8.8)
+-h Display this message 
+EOF
+exit 0
+    esac
+done
+#Check variables
+if [ -z "$dns" ]
+   then
+      dns=8.8.8.8
+fi
+if [ -z "$ip" ]
+   then
+      echo "-i option can't be empty, please specify ip address"
+fi
+if [ -z "$username" ]
+   then
+      echo "-u option can't be empty, please specify username"
+fi
 
 #Generate user keys
 mkdir $userpath/$username
@@ -20,7 +46,7 @@ echo -e "#$username\n[Peer]\nPublicKey = $pubkey\nAllowedIPs = $ip\n" >> $confpa
 #echo -e "\nNew lines in wg0.conf:"
 #tail -4 /etc/wireguard/wg0.conf
 
-echo -e "[Interface]\nPrivateKey = $privkey\nAddress = $ip\nDNS = ${dns:-8.8.8.8}\n[Peer]\nPublicKey = $server_pubkey\nAllowedIPs = 0.0.0.0/0\nEndpoint = $endpoint:443\nPersistentKeepalive = 20\n"  >> $userpath/${username}/${username}.conf
+echo -e "[Interface]\nPrivateKey = $privkey\nAddress = $ip\nDNS = $dns\n[Peer]\nPublicKey = $server_pubkey\nAllowedIPs = 0.0.0.0/0\nEndpoint = $endpoint:443\nPersistentKeepalive = 20\n"  >> $userpath/${username}/${username}.conf
 qrencode -t png -o $userpath/$username/$username.png -r $userpath/$username/$username.conf
 #Допилить qrencode -t ansiutf8 /opt/wg-configs/${username}/${username}.conf
 #echo -e "\nClient config is:"
